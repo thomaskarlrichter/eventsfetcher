@@ -1,0 +1,24 @@
+{
+  "name": "koelnactionfetcher",
+  "version": "1.0.0",
+  "description": "fetches kalendar entries from the event calendar of stadtrevue koeln",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "parse",
+    "html",
+    "calendar",
+    "events",
+    "cologne"
+  ],
+  "author": "Thomas Richter",
+  "license": "ISC",
+  "dependencies": {
+    "fetch": "^1.1.0",
+    "htmlparser2": "^3.9.1",
+    "query-dom": "^3.4.3"
+  }
+}
