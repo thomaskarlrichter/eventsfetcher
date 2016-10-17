@@ -19,6 +19,6 @@
   "dependencies": {
     "fetch": "^1.1.0",
     "htmlparser2": "^3.9.1",
-    "query-dom": "^3.4.3"
+    "jsdom": "^9.6.0"
   }
 }
