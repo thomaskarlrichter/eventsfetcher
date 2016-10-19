@@ -5,6 +5,7 @@ var eventList = [];
 var object = {};
 var CAT = "konzerte";
 var l = [];
+var excludedCat = /(maerkte|bonn|duesseldorf|region|kinder)/;
 var dayOfMonth = 3;
 var fetchDatePage = function(counter, url) {
   jsdom.env(
@@ -12,10 +13,15 @@ var fetchDatePage = function(counter, url) {
     ["http://code.jquery.com/jquery.js"],
     function (err, window) {
       var links = window.$(".tx-srtk-pi1-rubricView a")
-      .each(function(i, a) { l.push(a.href); });
+      .each(function(i, a) {
+        if(!a.href.match(excludedCat))
+          l.push(a.href);
+      });
+      console.log(l);
       if(l.length > 0){
-        console.log("on xxx"+myday.format("/YYYY/MM/DD/")+" "+eventList.length+" events recorded");
-        fetchPage(counter,l.shift());
+        CAT = l.shift();
+        console.log("on "+CAT.split("/")[5]+ " "+myday.format("/YYYY/MM/DD/")+" "+eventList.length+" events recorded");
+        fetchPage(counter,CAT);
       } else {
         if(counter === 0){
           console.log("on "+myday.format("/YYYY/MM/DD/")+" "+eventList.length+" events recorded");
@@ -62,8 +68,9 @@ var fetchPage = function(counter, url) {
         }
       });
       if(l.length > 0){
-        console.log("on xxx"+myday.format("/YYYY/MM/DD/")+" "+eventList.length+" events recorded");
-        fetchPage(counter,l.pop());
+        CAT = l.pop();
+        console.log("on "+CAT.split("/")[5]+ " "+myday.format("/YYYY/MM/DD/")+" "+eventList.length+" events recorded");
+        fetchPage(counter,CAT);
       } else {
         if(counter === 0){
           console.log("on "+myday.format("/YYYY/MM/DD/")+" "+eventList.length+" events recorded");
