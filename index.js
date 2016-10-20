@@ -5,7 +5,7 @@ var eventList = [];
 var object = {};
 var CAT = "konzerte";
 var l = [];
-var excludedCat = /(maerkte|bonn|duesseldorf|region|kinder)/;
+var includedCat = /(maerkte|kinder|konzerte)/;
 var dayOfMonth = 3;
 var fetchDatePage = function(counter, url) {
   jsdom.env(
@@ -14,7 +14,7 @@ var fetchDatePage = function(counter, url) {
     function (err, window) {
       var links = window.$(".tx-srtk-pi1-rubricView a")
       .each(function(i, a) {
-        if(!a.href.match(excludedCat))
+        if(a.href.match(includedCat))
           l.push(a.href);
       });
       console.log(l);
