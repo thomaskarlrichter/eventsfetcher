@@ -1,55 +1,25 @@
+var commandLineArgs = require("command-line-args");
+var options = commandLineArgs([
+  {name: "tage", alias: "t", type: Number},
+  {name: "datum", alias: "d", type: String}
+])
+console.log(JSON.stringify(options));
 var jsdom = require("jsdom");
 var moment = require("moment");
-var myday = moment();
-var eventList = [];
-var object = {};
-var CAT = "konzerte";
+var myday = moment(options.datum);
+var eventsList = [];
+var startCAT = "konzerte";
 var l = [];
-var includedCat = /(maerkte|kinder|konzerte)/;
-var dayOfMonth = 3;
-var fetchDatePage = function(counter, url) {
+var includedCat = /(kinder|konzerte)/;
+
+var fetchDatePage = function(counter, url, CAT, date) {
   jsdom.env(
-    url+CAT+myday.format("/YYYY/MM/DD/"),
-    ["http://code.jquery.com/jquery.js"],
-    function (err, window) {
-      var links = window.$(".tx-srtk-pi1-rubricView a")
-      .each(function(i, a) {
-        if(a.href.match(includedCat))
-          l.push(a.href);
-      });
-      console.log(l);
-      if(l.length > 0){
-        CAT = l.shift();
-        console.log("on "+CAT.split("/")[5]+ " "+myday.format("/YYYY/MM/DD/")+" "+eventList.length+" events recorded");
-        fetchPage(counter,CAT);
-      } else {
-        if(counter === 0){
-          console.log("on "+myday.format("/YYYY/MM/DD/")+" "+eventList.length+" events recorded");
-          require('fs').writeFile(
-            './events.json',
-            JSON.stringify(eventList),
-            function (err) {
-              if (err) {
-                console.error('Crap happens');
-              }
-            }
-          );
-        } else {
-          console.log("on "+myday.format("/YYYY/MM/DD/")+" "+eventList.length+" events recorded");
-          counter--;
-          myday.add(1,"day");
-          fetchDatePage(counter, url);
-          }
-      }
-    });
-}
-var fetchPage = function(counter, url) {
-  jsdom.env(
-    url,
+    url+CAT+date.format("/YYYY/MM/DD/"),
     ["http://code.jquery.com/jquery.js"],
     function (err, window) {
       var root = window.$(".tx-srtk-pi1-listrow");
       root.children().map(function(number, item) {
+        var object = {};
         var cat = item.classList["0"];
         if(cat) {
           if(cat.endsWith("date"))
@@ -62,21 +32,29 @@ var fetchPage = function(counter, url) {
           if(cat.endsWith("title")) object.title=item.textContent;
           if(cat.endsWith("text")) {
             object.text=item.textContent;
-            eventList.push(object);
-            object = {};
+            eventsList.push(object);
           }
         }
       });
+      if(!l){
+        var links = window.$(".tx-srtk-pi1-rubricView a")
+          .each(function(i, a) {
+            var cat = a.href.split("/")[5];
+            if(cat.match(includedCat))
+              l.push(cat);
+          });
+        console.log(l);
+      }
       if(l.length > 0){
-        CAT = l.pop();
-        console.log("on "+CAT.split("/")[5]+ " "+myday.format("/YYYY/MM/DD/")+" "+eventList.length+" events recorded");
-        fetchPage(counter,CAT);
+        //console.log("on "+CAT.split("/")[5]+ " "+myday.format("/YYYY/MM/DD/")+" "+eventList.length+" events recorded");
+        fetchDatePage(counter, url, l.shift(), date);
       } else {
         if(counter === 0){
-          console.log("on "+myday.format("/YYYY/MM/DD/")+" "+eventList.length+" events recorded");
+          console.log("on "+date.format("/YYYY/MM/DD/")+" "+eventsList.length+" events recorded");
+          console.log(JSON.stringify(eventsList));
           require('fs').writeFile(
             './events.json',
-            JSON.stringify(eventList),
+            JSON.stringify(eventsList, null, 2),
             function (err) {
               if (err) {
                 console.error('Crap happens');
@@ -84,15 +62,14 @@ var fetchPage = function(counter, url) {
             }
           );
         } else {
-          console.log("on "+myday.format("/YYYY/MM/DD/")+" "+eventList.length+" events recorded");
+          console.log("on "+date.format("/YYYY/MM/DD/")+" "+eventsList.length+" events recorded");
           counter--;
-          myday.add(1,"day");
-          var url = "http://www.stadtrevue.de/tageskalender/tageskalender-results/";
-          fetchDatePage(counter, url);
-        }
+          date.add(1,"day");
+          fetchDatePage(counter, url, CAT, date);
+          }
       }
     });
 }
 //http://www.stadtrevue.de/tageskalender/tageskalender-results/konzerte/2016/10/5/
-fetchDatePage(dayOfMonth, "http://www.stadtrevue.de/tageskalender/tageskalender-results/");
+fetchDatePage(options.tage, "http://www.stadtrevue.de/tageskalender/tageskalender-results/", startCAT, myday);
 console.log("begin fetching...");
