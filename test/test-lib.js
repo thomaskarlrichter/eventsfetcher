@@ -11,7 +11,7 @@ describe("ernte lib", function() {
   });
   describe("to something", function() {
     it("do it", function() {
-      expect(myErnteLib.do).to.exist;
+      expect(myErnteLib.do).to.exist();
     });
   });
 });

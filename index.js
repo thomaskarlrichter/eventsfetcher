@@ -8,7 +8,7 @@ var options = commandLineArgs([
 console.log(JSON.stringify(options));
 var jsdom = require("jsdom");
 var moment = require("moment");
-var myday = moment(options.datum);
+var myday = options.datum?moment(options.datum.split('/').join('-')):moment();
 var eventsList = [];
 var startCAT = "kinder";
 var l = [];
@@ -37,7 +37,6 @@ var fetchDatePage = function(counter, url, CAT, date) {
       var root = window.$(".tx-srtk-pi1-listrow");
       root.children().map(function(number, item) {
         var cat = item.classList["0"];
-        console.log("--->",cat);
         if(cat) {
           if(cat.endsWith("date"))
             object.date=item.textContent;
