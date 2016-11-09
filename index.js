@@ -2,7 +2,7 @@ var commandLineArgs = require("command-line-args");
 var options = commandLineArgs([
   {name: "tage", alias: "t", type: Number},
   {name: "datum", alias: "d", type: String}
-])
+]);
 console.log(JSON.stringify(options));
 var jsdom = require("jsdom");
 var moment = require("moment");
@@ -57,7 +57,7 @@ var fetchDatePage = function(counter, url, CAT, date) {
             JSON.stringify(eventsList, null, 2),
             function (err) {
               if (err) {
-                console.error('Crap happens');
+                console.error('Fehler beim Schreiben der events-JSON-Datei');
               }
             }
           );
@@ -69,7 +69,7 @@ var fetchDatePage = function(counter, url, CAT, date) {
           }
       }
     });
-}
+};
 //http://www.stadtrevue.de/tageskalender/tageskalender-results/konzerte/2016/10/5/
-fetchDatePage(options.tage, "http://www.stadtrevue.de/tageskalender/tageskalender-results/", startCAT, myday);
+fetchDatePage(options.tage || 1, "http://www.stadtrevue.de/tageskalender/tageskalender-results/", startCAT, myday);
 console.log("begin fetching...");
