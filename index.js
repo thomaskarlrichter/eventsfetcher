@@ -16,7 +16,7 @@ var eventsList = [];
 var object = {};
 var allCats = "(partys|kinder|konzerte|bar-sounds|theater|tanz|kleinkunst|kunst|literatur|schwul-lesbisch|diverses|maerkte)";
 var startCAT = "kinder";
-var l = [];
+var catsOnDay = [];
 var includedCat = options.cats ? new RegExp(options.cats) : new RegExp(allCats);
 
 var fetchDatePage = function(counter, url, CAT, date) {
@@ -52,9 +52,11 @@ var fetchDatePage = function(counter, url, CAT, date) {
                 object.time=item.textContent;
               else if(cat.endsWith("rubric")) 
                 object.rubric=item.textContent;
-              else if(cat.endsWith("name")) 
-                object.name=item.textContent;
-              else if(cat.endsWith("title")) 
+              else if(cat.endsWith("name")) {
+                console.log(window.$(item).find("a").attr("href"));
+                object.ort_url= window.$(item).find("a").attr("href");
+                object.loc_name=item.textContent.slice(0,-2);
+              } else if(cat.endsWith("title")) 
                 object.title=item.textContent;
               else if(cat.endsWith("text")) {
                 object.text=item.textContent;
@@ -64,22 +66,22 @@ var fetchDatePage = function(counter, url, CAT, date) {
             }
           });
         }
-        if(l.length > 0){
-          category = l.shift();
-          console.log("fetch on ",category);
+        if(catsOnDay.length > 0){
+          category = catsOnDay.shift();
+          console.log("fetch on",category);
           fetchDatePage(counter, url, category, date);
         } else {
           window.$(".tx-srtk-pi1-rubricView a").each(function(i, a) {
               var cat = a.href.split("/")[5];
               if(cat.match(includedCat))
-                l.push(cat);
+                catsOnDay.push(cat);
             });
           console.log(eventsList.length+" events recorded");
-          console.log(l);
+          console.log(catsOnDay);
           counter--;
           date.add(1,"day");
-          category = l.shift();
-          console.log("fetch on ",category);
+          category = catsOnDay.shift();
+          console.log("fetch on",category);
           fetchDatePage(counter, url, category, date);
         }
       });
