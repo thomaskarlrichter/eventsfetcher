@@ -1,7 +1,7 @@
 {
   "name": "koelnactionfetcher",
   "version": "1.0.0",
-  "description": "fetches kalendar entries from the event calendar of stadtrevue koeln",
+  "description": "fetches eventcalendar entries from stadtrevue koeln",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
