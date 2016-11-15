@@ -41,6 +41,7 @@ var fetchDatePage = function(counter, url, CAT, date) {
       url + (CAT==="start"?"konzerte":CAT) + date.format("/YYYY/MM/DD/"),
       ["http://code.jquery.com/jquery.js"],
       function (err, window) {
+        console.log(window.$("body").html());
         var category;
         if(CAT !== "start"){
           // einlesen der events in die eventsList
