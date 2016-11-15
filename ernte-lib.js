@@ -396,6 +396,18 @@ function ernte() {
       return text;
     }
   };
+  this.textFilter = function(text, limit) {
+    var checkCheap = /(eintritt\s+frei|gratis|umsonst|\W([Vv]v|[Aa])k\s+(\d+)|Eintritt\s+(\d+)\,(\d+)|(\d+),-)/;
+    var m;
+    if(m=text.match(checkCheap)){
+      if(m[3]) {
+        if(+m[3]<limit) {
+          return +m[3];
+        } else return 100;
+      } else return 0;
+    } else
+      return 100;
+  };
 
   //filtert inhalte / beschreibungen anhand von preisangaben
   this.filterPreis = function filterPreis(text){

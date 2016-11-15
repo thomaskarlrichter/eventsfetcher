@@ -2,6 +2,8 @@ var commandLineArgs = require("command-line-args");
 var jsdom = require("jsdom");
 var moment = require("moment");
 var fs = require("fs");
+var ernteLib = require("./ernte-lib");
+var ernte = new ernteLib();
 
 var options = commandLineArgs([
   {name: "tage", alias: "t", type: Number},
@@ -18,6 +20,8 @@ var allCats = "(partys|kinder|konzerte|bar-sounds|theater|tanz|kleinkunst|kunst|
 var startCAT = "kinder";
 var catsOnDay = [];
 var includedCat = options.cats ? new RegExp(options.cats) : new RegExp(allCats);
+
+
 
 var fetchDatePage = function(counter, url, CAT, date) {
 	if(counter === 0){
@@ -60,6 +64,7 @@ var fetchDatePage = function(counter, url, CAT, date) {
                 object.title=item.textContent;
               else if(cat.endsWith("text")) {
                 object.text=item.textContent;
+                object.cheap = ernte.textFilter(object.text, 5);
                 eventsList.push(object);
                 object = {};
               }
