@@ -2,8 +2,8 @@ var commandLineArgs = require("command-line-args");
 var jsdom = require("jsdom");
 var moment = require("moment");
 var fs = require("fs");
-var ernteLib = require("./ernte-lib");
-var ernte = new ernteLib();
+var eventsLib = require("./events-lib");
+
 
 var options = commandLineArgs([
   {name: "tage", alias: "t", type: Number},
@@ -37,11 +37,11 @@ var fetchDatePage = function(counter, url, CAT, date) {
 		);
 		return;
   } else {
+    console.log(url + (CAT==="start"?"konzerte":CAT) + date.format("/YYYY/MM/DD/"));
     jsdom.env(
       url + (CAT==="start"?"konzerte":CAT) + date.format("/YYYY/MM/DD/"),
       ["http://code.jquery.com/jquery.js"],
       function (err, window) {
-        console.log(window.$("body").html());
         var category;
         if(CAT !== "start"){
           // einlesen der events in die eventsList
@@ -65,8 +65,12 @@ var fetchDatePage = function(counter, url, CAT, date) {
                 object.title=item.textContent;
               else if(cat.endsWith("text")) {
                 object.text=item.textContent;
-                object.cheap = ernte.textFilter(object.text, 5);
-                eventsList.push(object);
+                var preis = eventsLib.textFilter(object.text, 50);
+                console.log(preis,object.text);
+                if(preis !== 100){
+                  object.preis = preis;
+                  eventsList.push(object);
+                }
                 object = {};
               }
             }
