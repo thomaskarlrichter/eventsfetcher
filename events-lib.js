@@ -28,11 +28,11 @@ exports.textFilter = function(text, limit) {
 exports.makeText = function(eventList) {
   var out="";
   eventList.map(function(element){
-    out = out + element.date+"\n\n\n";
-    out = out + element.rubric + "\n";
-    out = out + " "+ element.loc_name + "\n    ";
-    out = out + element.time.split(" ")[0] + " " + element.title + "\n     ";
-    out = out + element.pretext + element.text + "\n\n\n";
+    out = out + element.date+"\r\n\r\n\r\n";
+    out = out + element.rubric + "\r\n";
+    out = out + " "+ element.loc_name + "\r\n    ";
+    out = out + element.time.split(" ")[0] + " " + element.title + "\r\n     ";
+    out = out + element.pretext + element.text + "\r\n\r\n\r\n";
   });
   return out;
 };
