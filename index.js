@@ -3,7 +3,9 @@ var jsdom = require("jsdom");
 var moment = require("moment");
 var fs = require("fs");
 var eventsLib = require("./events-lib");
-
+var Iconv  = require('iconv').Iconv;
+// convert from UTF-8 to ISO-8859-1
+var iconv = new Iconv('UTF-8', 'ISO-8859-1');
 
 var options = commandLineArgs([
   {name: "tage", alias: "t", type: Number},
@@ -35,11 +37,19 @@ var fetchDatePage = function(counter, url, CAT, date) {
 				}
 			}
 		);
+		fs.writeFile(
+		  "./events.txt",
+		  iconv.convert(eventsLib.makeText(eventsList)),
+		  function (err) {
+		    if(err){
+		      console.log("Fehler beim Schreiben der Datei events.txt im Format  ISO-8859-1");
+		    }
+		  });
 		return;
   } else {
     console.log(url + (CAT==="start"?"konzerte":CAT) + date.format("/YYYY/MM/DD/"));
     jsdom.env(
-      url + (CAT==="start"?"konzerte":CAT) + date.format("/YYYY/MM/DD/"),
+      url + (CAT==="start"?"konzerte":CAT) + date.format("/YYYY/MM/D/"),
       ["http://code.jquery.com/jquery.js"],
       function (err, window) {
         var category;
@@ -54,7 +64,7 @@ var fetchDatePage = function(counter, url, CAT, date) {
               else
                 object.date=myday.format("DD.MM.YYYY");
               if(cat.endsWith("time")) 
-                object.time=item.textContent;
+                object.time=item.textContent.split(" ").join(" ");
               else if(cat.endsWith("rubric")) 
                 object.rubric=item.textContent;
               else if(cat.endsWith("name")) {
@@ -65,10 +75,11 @@ var fetchDatePage = function(counter, url, CAT, date) {
                 object.title=item.textContent;
               else if(cat.endsWith("text")) {
                 object.text=item.textContent;
-                var preis = eventsLib.textFilter(object.text, 50);
+                var preis = eventsLib.textFilter(object.text, 7);
                 console.log(preis,object.text);
                 if(preis !== 100){
                   object.preis = preis;
+                  object.pretext = "Ak "+preis+" ";
                   eventsList.push(object);
                 }
                 object = {};
@@ -78,9 +89,9 @@ var fetchDatePage = function(counter, url, CAT, date) {
         }
         if(catsOnDay.length > 0){
           category = catsOnDay.shift();
-          console.log("fetch on",category);
           fetchDatePage(counter, url, category, date);
         } else {
+          console.log(window.$(".tx-srtk-pi1-rubricView a").length, " Elemente");
           window.$(".tx-srtk-pi1-rubricView a").each(function(i, a) {
               var cat = a.href.split("/")[5];
               if(cat.match(includedCat))
