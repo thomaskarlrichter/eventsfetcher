@@ -23,6 +23,7 @@
     "htmlparser2": "^3.9.1",
     "iconv": "^2.2.1",
     "jsdom": "^9.6.0",
+    "lodash": "^4.17.2",
     "moment": "^2.15.1"
   },
   "devDependencies": {

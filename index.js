@@ -11,6 +11,7 @@ var options = commandLineArgs([
   {name: "tage", alias: "t", type: Number},
   {name: "datum", alias: "d", type: String},
   {name: "cats", alias: "c", type: String},
+  {name: "max", alias: "m", type: Number},
   {name: "url", alias: "u", type: String}
 ]);
 console.log(JSON.stringify(options));
@@ -19,6 +20,7 @@ var myday = options.datum?moment(options.datum.split('/').join('-')):moment();
 var eventsList = [];
 var object = {};
 var allCats = "(partys|kinder|konzerte|bar-sounds|theater|tanz|kleinkunst|kunst|literatur|schwul-lesbisch|diverses|maerkte)";
+var max = options.max || 5;
 var startCAT = "kinder";
 var catsOnDay = [];
 var includedCat = options.cats ? new RegExp(options.cats) : new RegExp(allCats);
@@ -75,7 +77,7 @@ var fetchDatePage = function(counter, url, CAT, date) {
                 object.title=item.textContent;
               else if(cat.endsWith("text")) {
                 object.text=item.textContent;
-                var preis = eventsLib.textFilter(object.text, 7);
+                var preis = eventsLib.textFilter(object.text, max);
                 console.log(preis,object.text);
                 if(preis !== 100){
                   object.preis = preis;
