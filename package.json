@@ -1,11 +1,11 @@
 {
   "name": "koelnactionfetcher",
   "version": "1.0.0",
-  "description": "fetches eventcalendar entries from stadtrevue koeln",
+  "description": "fetches kalendar entries from the event calendar of stadtrevue koeln",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "./node_modules/.bin/mocha --reporter spec"
+    "test":  "./node_modules/.bin/mocha --reporter spec"
   },
   "keywords": [
     "parse",
@@ -17,13 +17,9 @@
   "author": "Thomas Richter",
   "license": "ISC",
   "dependencies": {
-    "command-line-args": "^3.0.1",
-    "command-line-commands": "^1.0.4",
     "fetch": "^1.1.0",
     "htmlparser2": "^3.9.1",
-    "iconv": "^2.2.1",
     "jsdom": "^9.6.0",
-    "lodash": "^4.17.2",
     "moment": "^2.15.1"
   },
   "devDependencies": {

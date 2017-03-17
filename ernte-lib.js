@@ -9,10 +9,10 @@ function ernte() {
   var HALT = false; //soll das skript beendet werden?
 
   var CALENDAR_DATE = new Array(3); //YYYY-MM-DD
-  var CATS_NAME = []; //die Veranstaltungs-Kategorien
-  var CATS_ID = [];//die zugeordneter rubrikid
-  var CATS_CONTENT =[]; //der gelesene inhalt der rubrik
-  var CATS_DB_NAME = []; //der name der zugehörigen rubrik in der datenbank
+  var CATS_NAME = new Array(); //die Veranstaltungs-Kategorien
+  var CATS_ID = new Array(); //die zugeordneter rubrikid
+  var CATS_CONTENT = new Array(); //der gelesene inhalt der rubrik
+  var CATS_DB_NAME = new Array(); //der name der zugehörigen rubrik in der datenbank
 
   var logdata = "";
 
@@ -88,34 +88,34 @@ function ernte() {
     var mm=date.getMonth() + 2;
     var yyyy=date.getFullYear();
     if (mm>12)
-    {        mm-=12;
-      yyyy++;
-    }
-    var cdate = prompt("Start-Datum eingeben: (YYYY-MM-DD)", yyyy+"-"+toLength2(mm)+"-01");
-    // Datum wird in Array mit 3 Feldern ueberfuehrt (1=Jahr,2=Monat,3=Tag)
-    CALENDAR_DATE = cdate.split("-");
-    // Die Felder im Datumsarray werden von String zu Integer geparsed, dabei fallen
-    // fuehrende Nullen weg (bspw. 08=>8), da die URL der Stadtrevue sonst falsch ist
-    // bei parseINT ist das ,10 wichtig, da sonst 0x Zahlen dem Oktalzahlensystem
-    // zugeordnet werden, die 10 erzwingt immer die Verwendung des Dezimalzahlsystems
-    var i;
-    for (i=0;i<=2;++i)
-    {
-      CALENDAR_DATE[i]=parseInt(CALENDAR_DATE[i],10);
-    }
-    cdate = CALENDAR_DATE.join("/");
-    //---
-    var days = [];
-    var daycount = 0;
-    while(!HALT){
-      days[daycount++] = new Array(toLength2(CALENDAR_DATE[2])+"."+toLength2(CALENDAR_DATE[1])+"."+CALENDAR_DATE[0],browseCats(cdate));
-      // Array days[1,2]: [1]:"01.08.2011/",[2]:"Kategorie"
-      cdate = nextDay();
-      if(CALENDAR_DATE[2] > 31){
-        HALT = true;
+      {        mm-=12;
+        yyyy++;
       }
-    }
-    makeText(days);
+      var cdate = prompt("Start-Datum eingeben: (YYYY-MM-DD)", yyyy+"-"+toLength2(mm)+"-01");
+      // Datum wird in Array mit 3 Feldern ueberfuehrt (1=Jahr,2=Monat,3=Tag)
+      CALENDAR_DATE = cdate.split("-");
+      // Die Felder im Datumsarray werden von String zu Integer geparsed, dabei fallen
+      // fuehrende Nullen weg (bspw. 08=>8), da die URL der Stadtrevue sonst falsch ist
+      // bei parseINT ist das ,10 wichtig, da sonst 0x Zahlen dem Oktalzahlensystem
+      // zugeordnet werden, die 10 erzwingt immer die Verwendung des Dezimalzahlsystems
+      var i;
+      for (i=0;i<=2;++i)
+      {
+        CALENDAR_DATE[i]=parseInt(CALENDAR_DATE[i],10);
+      }
+      cdate = CALENDAR_DATE.join("/");
+      //---
+      var days = new Array();
+      var daycount = 0;
+      while(!HALT){
+        days[daycount++] = new Array(toLength2(CALENDAR_DATE[2])+"."+toLength2(CALENDAR_DATE[1])+"."+CALENDAR_DATE[0],browseCats(cdate));
+        // Array days[1,2]: [1]:"01.08.2011/",[2]:"Kategorie"
+        cdate = nextDay();
+        if(CALENDAR_DATE[2] > 31){
+          HALT = true;
+        }
+      }
+      makeText(days);
   }
 
   // Das Datum im days Array braucht wieder die fuehrende 0 fuer die korrekte Verarbeitung spaeter
@@ -133,14 +133,14 @@ function ernte() {
       x = tL2AddZero.concat(xtoString);
     }
     return (x);
-  };
+  }
 
   //zählt den tag hoch und liefert den neuen datums-string
   this.nextDay = function nextDay(){
     CALENDAR_DATE[2]++; //YYYY-MM-DD
     var string = CALENDAR_DATE.join("/");
     return string;
-  };
+  }
 
   //führt ein makro aus und liefert ggf. den extrahierten inhalt
   function macro(code){
@@ -156,6 +156,7 @@ function ernte() {
         break;
       case -933: // 404 Page not found!
         return "ERROR404";
+        break;
       default: //irgendein anderer Fehler oder TIMEOUT beendet das Script
 
         error_message("Das Script wird beendet. Code: "+ret);
@@ -168,7 +169,7 @@ function ernte() {
   this.browseCats = function browseCats(cdate){
     var cat;
     var page;
-    var pages = []; //result array
+    var pages = new Array(); //result array
     var korrektur;
     for(var i = -1;++i != CATS_NAME.length && !HALT;){
       var extraseiten = 0;
@@ -183,7 +184,7 @@ function ernte() {
       }
       cat = macro("TAG POS=1 TYPE=DIV ATTR=CLASS:tx-srtk-pi1-rubricAndDateView EXTRACT=TXT");
       message(cdate+" "+CATS_NAME[i]);
-      if(cat !== ""){
+      if(cat != ""){
         //                 alert("in CAT IF: "+cat);
         //                         if(cat != CATS_NAME[i]){ //ggf. hat kategorie falsche ID?
         //                          error_message(cat + " != "+CATS_NAME[i]);
@@ -192,7 +193,7 @@ function ernte() {
         var script = "TAG POS=1 TYPE=BODY ATTR=* EXTRACT=HTM";
         var text = macro(script);
         //schauen ob extra seiten vorkommen (mehr als 10 Veranstaltungen)
-        if(extraseiten === 0 && text.search("target=\"_self\">Seite 2") != -1){
+        if(extraseiten == 0 && text.search("target=\"_self\">Seite 2") != -1){
           extraseiten = 1;
           if(text.search("target=\"_self\">Seite 3") != -1){
             extraseiten = 2;//maximal 2 Extraseiten
@@ -215,13 +216,13 @@ function ernte() {
       }
     }
     return pages;
-  };
+  }
 
   //ruft eine kalender seite der stadtrevue auf, die durch datum und kategorie spezifiziert ist
   function browse(cdate,cat,j){
     var url;
     var browseerror;
-    if(cdate === ""){
+    if(cdate == ""){
       cdate = nextDay();
     }
     // Beispielurl mit Kategorie und Datum:
@@ -233,12 +234,12 @@ function ernte() {
     browseerror = macro("URL GOTO="+url);
     //         alert("browser error? "+browseerror);
     if (browseerror == "ERROR404" )
-    {
-      error_message(cdate+"\r\n404 Error\r\nSeite nicht gefunden!\r\nFehlerhafte Kategorie?\r\n"+cat);
-      return false;
-    }
-    else { return true; }
-    //  return true;
+      {
+        error_message(cdate+"\r\n404 Error\r\nSeite nicht gefunden!\r\nFehlerhafte Kategorie?\r\n"+cat);
+        return false;
+      }
+      else { return true; }
+      //  return true;
   }
 
   //liest den inhalt einer seite
@@ -266,7 +267,7 @@ function ernte() {
         if(fresult == "gratis"){
           fresult = 0;
         }else{
-          if(fresult === false){
+          if(fresult == false){
             ++block;
             continue;
           }
@@ -285,7 +286,7 @@ function ernte() {
       }
     }
     return result;
-  };
+  }
 
   //erzeugt eine beschreibung der seite: [LOCATION ID] -> Anzahl der Termine
   this.createPageDescription = function createPageDescription(text){
@@ -295,7 +296,7 @@ function ernte() {
       tkvort[i] = tkvort[i].length - 1;
     }
     return tkvort;
-  };
+  }
 
   //nachricht ausgeben
   function message(mess){
@@ -345,22 +346,22 @@ function ernte() {
     }
     printTextToPage((NEUEORTE ? NEUEORTE+"\r\n\r\n\r\n---------------------\r\n\r\n\r\n" : '')+ctext);
     // printTextToPage((NEUEORTE ? NEUEORTE+"\r\n\r\n\r\n---------------------\r\n\r\n\r\n" : '')+ctext+"\n\n\n\n--------------\nLOGDATEN:\n"+logdata);
-  };
+  }
 
   //baut die struktur der beschreibung so um, dass der preis am ANFANG steht
   this.rebuildPrice = function rebuildPrice(text,preis){
     var r;
-    var remove = [
-      "Eintritt",
-      "Kinder",
-      "Ak",
-      "VVK",
-      "MVZ"
-    ];
+    var remove = new Array(
+      "Eintritt"
+         ,"Kinder"
+         ,"Ak"
+         ,"VVK"
+         ,"MVZ"
+    );
     text = text.replace(/Eintritt frei/i,'');
     text = text.replace(/gratis und nicht umsonst/i,'');
     for(var i = -1;++i != remove.length;){
-      r = new RegExp(remove[i]+"\\s*\\d+,-","i");
+      r = new RegExp(remove[i]+"\\s*\\d+,-","i")
       text = text.replace(r,'');
       r = new RegExp(remove[i]+"\\s*\\d+,\\d+,-","i");
       text = text.replace(r,'');
@@ -382,53 +383,41 @@ function ernte() {
     text = text.replace(/\.\s*$/g,'');
     text = text.replace(/,\s*$/g,'');
 
-    return (preis > 0 || text === "" ? " Ak "+(preis+"").replace(/\./,',') : "") + " " + text;
-  };
+    return (preis > 0 || text == "" ? " Ak "+(preis+"").replace(/\./,',') : "") + " " + text;
+  }
 
   //sucht nach ortsangaben
   this.filterOrt = function filterOrt(text,ortsname){
     var ex = /[^\w]Ort:.*/;
-    var orte = text.match(ex);
-    if(orte !== null && orte.length !== 0){
-      NEUEORTE += "\r\n"+ortsname+" = "+orte[0];
-      return text.replace(ex,'');
-    }else{
-      return text;
-    }
-  };
-  this.textFilter = function(text, limit) {
-    var checkCheap = /(eintritt\s+frei|gratis|umsonst|\W([Vv]v|[Aa])k\s+(\d+)|Eintritt\s+(\d+)\,(\d+)|(\d+),-)/;
-    var m;
-    if(m=text.match(checkCheap)){
-      if(m[3]) {
-        if(+m[3]<limit) {
-          return +m[3];
-        } else return 100;
-      } else return 0;
-    } else
-      return 100;
-  };
+var orte = text.match(ex);
+if(orte != null && orte.length != 0){
+  NEUEORTE += "\r\n"+ortsname+" = "+orte[0];
+  return text.replace(ex,'');
+}else{
+  return text;
+}
+  }
 
   //filtert inhalte / beschreibungen anhand von preisangaben
   this.filterPreis = function filterPreis(text){
     //Alles > maxPreis € wird ignoriert. (> und nicht >=)
     var maxPreis = 5;
-    var positivliste =[ 
-      /eintritt\s+frei/i,
-      /gratis/i,
-      /umsonst/i,
-      /Eintritt\s+\d+\,\d+/i,
-      /Eintritt\s+\d+/i,
-      /\Wak\s+(:?ab\s+)?\d+\,\d+/i,
-      /\Wak\s+(:?ab\s+)?\d+/i,
-      /\Wvvk\s+\d+\,\d+/i,
-      /\Wvvk\s+\d+/i,
-      /\Wmvz\s+\d+\,\d+/i,
-      /\Wmvz\s+\d+/i,
-      /\WKinder\s+\d+/,
-      /\d+,-/
-    ];
-    var negativliste = [];
+    var positivliste = new Array(
+      /eintritt\s+frei/i
+      ,/gratis/i
+      ,/umsonst/i
+      ,/Eintritt\s+\d+\,\d+/i
+      ,/Eintritt\s+\d+/i
+      ,/\Wak\s+(:?ab\s+)?\d+\,\d+/i
+      ,/\Wak\s+(:?ab\s+)?\d+/i
+      ,/\Wvvk\s+\d+\,\d+/i
+      ,/\Wvvk\s+\d+/i
+      ,/\Wmvz\s+\d+\,\d+/i
+      ,/\Wmvz\s+\d+/i
+      ,/\WKinder\s+\d+/
+      ,/\d+,-/
+    );
+    var negativliste = new Array();
     var preis;
     var preisarray;
     var teuerst;
@@ -439,38 +428,38 @@ function ernte() {
         return false;
       }
     }
-    for(i = -1;++i!==positivliste.length;){
+    for(var i = -1;++i!=positivliste.length;){
       if(text.search(positivliste[i]) != -1){
         preisarray = text.match(positivliste[i]);
         teuerst = -1;
-        for(var p = -1;++p !== preisarray.length;)
-          if (preisarray[p]!==undefined) { //einträge positivliste durchlaufen
-            //                        alert("preisarray.length="+preisarray.length+", p="+p+", preisarray[p]="+preisarray[p]);
-            preis = numOf(preisarray[p]);
-            if(preis !== false){
-              if(preis > teuerst){
-                teuerst = preis;
-              }
-              if(preis > maxPreis){
-                logdata = logdata+"\n"+preis+">"+maxPreis;
-                return false;
-              }
-            }else if(teuerst == -1){
-              teuerst = "gratis"; //gratis, umsonst
+        for(var p = -1;++p != preisarray.length;)
+        if (preisarray[p]!=undefined) { //einträge positivliste durchlaufen
+          //                        alert("preisarray.length="+preisarray.length+", p="+p+", preisarray[p]="+preisarray[p]);
+          preis = numOf(preisarray[p]);
+          if(preis != false){
+            if(preis > teuerst){
+              teuerst = preis;
             }
+            if(preis > maxPreis){
+              logdata = logdata+"\n"+preis+">"+maxPreis;
+              return false;
+            }
+          }else if(teuerst == -1){
+            teuerst = "gratis"; //gratis, umsonst
           }
+        }
         logdata = logdata+"\n"+teuerst+ "Euro";
         return teuerst; //suchergebnis statt true
       }
     }
     logdata = logdata+"\n"+"nichts gefunden...";
     return false;
-  };
+  }
 
   //schneidet überstehende spaces ab und entfernt zeilenumbrüche
   this.trim = function trim(text){
     return text.replace(/^\s*/,'').replace(/\s*$/,'').split("\r\n").join(" ").split("\n").join(" ");
-  };
+  }
 
   function printTextToPage(text){
     //alert(text);
@@ -484,7 +473,7 @@ function ernte() {
       res = res + "/" + text.charCodeAt(i);
     }
     return res;
-  };
+  }
 
   //liefert den zahlenwert eines strings
   this.numOf = function numOf(sText) {
@@ -514,6 +503,6 @@ function ernte() {
       return false;
     }
     return sText.substring(start,end+1).replace(/\,/,'.') * 1;
-  };
+  }
 }
 module.exports = ernte;
